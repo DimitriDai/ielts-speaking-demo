@@ -4,14 +4,13 @@ import os
 import json
 
 CONFIG_PATH = "Spk_Config.json"
-BASE_PATH = "D:/Python/Code/EduTech"
 
 SCRIPT_MAP = {
-    "Step 1": os.path.join(BASE_PATH, "Spk_S1_Screenshot_Rename.py"),
-    "Step 2": os.path.join(BASE_PATH, "Spk_S2_Screenshot_to_text.py"),
-    "Step 3": os.path.join(BASE_PATH, "Spk_S3_Dpsk_Answer_Draft.py"),
-    "Step 4": os.path.join(BASE_PATH, "Spk_S4_Txt_to_Docx.py"),
-    "Step 5": os.path.join(BASE_PATH, "Spk_S5_Q&A_Together.py"),
+    "Step 1": "Spk_S1_Screenshot_Rename.py",
+    "Step 2": "Spk_S2_Screenshot_to_text.py",
+    "Step 3": "Spk_S3_Dpsk_Answer_Draft.py",
+    "Step 4": "Spk_S4_Txt_to_Docx.py",
+    "Step 5": "Spk_S5_Q&A_Together.py"
 }
 
 def load_or_create_config():
