@@ -18,7 +18,7 @@ st.title("📘 雅思口语批处理工具 Demo")
 
 # === 上传图片 ===
 st.subheader("🖼️ Step 1：上传截图图片")
-uploaded_files = st.file_uploader("上传雅思哥截图（可多选）", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
+uploaded_files = st.file_uploader("上传截图（可多选）", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
 
 TEMP_IMG_DIR = "uploaded_imgs"
 TXT_PREFILL_DIR = "txt_prefill"
@@ -32,7 +32,7 @@ os.makedirs(ANSWER_DIR, exist_ok=True)
 if uploaded_files:
     for i, file in enumerate(uploaded_files):
         ext = os.path.splitext(file.name)[-1]
-        save_path = os.path.join(TEMP_IMG_DIR, f"雅思哥截图_{i+1}{ext}")
+        save_path = os.path.join(TEMP_IMG_DIR, f"input_{i+1}{ext}")
         with open(save_path, "wb") as f:
             f.write(file.read())
     st.success(f"✅ 已保存 {len(uploaded_files)} 张图片到 {TEMP_IMG_DIR} 文件夹")
@@ -55,7 +55,7 @@ col1, col2 = st.columns(2)
 
 with col1:
     if st.button("Step 1: 重命名截图"):
-        run_step("Step 1", SCRIPT_MAP["Step 1"], ["--input", TEMP_IMG_DIR, "--prefix", "雅思哥截图"])
+        run_step("Step 1", SCRIPT_MAP["Step 1"], ["--input", TEMP_IMG_DIR, "--prefix", "input"])
 
     if st.button("Step 3: 生成答案"):
         run_step("Step 3", SCRIPT_MAP["Step 3"], ["--input", TXT_PREFILL_DIR, "--output", ANSWER_DIR])
