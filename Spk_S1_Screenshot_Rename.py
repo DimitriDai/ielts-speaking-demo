@@ -22,7 +22,7 @@ def rename_screenshots(folder_path, new_name):
 # ⬇️ 下面是入口，负责接收命令行参数
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", required=True, help="截图文件夹路径")
-parser.add_argument("--prefix", default="截图", help="文件名前缀")
+parser.add_argument("--prefix", default="input", help="文件名前缀")
 args = parser.parse_args()
 
 rename_screenshots(args.input, args.prefix)
