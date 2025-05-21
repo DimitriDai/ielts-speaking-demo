@@ -1,10 +1,9 @@
 import streamlit as st
 import subprocess
 import os
-import json
+import shutil
 
-CONFIG_PATH = "Spk_Config.json"
-
+# === 脚本路径映射 ===
 SCRIPT_MAP = {
     "Step 1": "Spk_S1_Screenshot_Rename.py",
     "Step 2": "Spk_S2_Screenshot_to_text.py",
@@ -13,41 +12,32 @@ SCRIPT_MAP = {
     "Step 5": "Spk_S5_Q&A_Together.py"
 }
 
-def load_or_create_config():
-    if os.path.exists(CONFIG_PATH):
-        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    else:
-        return {
-            "IMG_DIR": "",
-            "TXT_PREFILL_DIR": "",
-            "ANSWER_DIR": ""
-        }
-
-def save_config(config):
-    with open(CONFIG_PATH, "w", encoding="utf-8") as f:
-        json.dump(config, f, indent=2, ensure_ascii=False)
-
-# === Streamlit 页面开始 ===
+# === 页面初始化 ===
 st.set_page_config(page_title="雅思口语全流程工具", layout="wide")
 st.title("📘 雅思口语批处理工具 Demo")
 
-config = load_or_create_config()
+# === 上传图片 ===
+st.subheader("🖼️ Step 1：上传截图图片")
+uploaded_files = st.file_uploader("上传雅思哥截图（可多选）", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
 
-# === 选择路径 ===
-st.subheader("🗂️ 路径设置")
-config["IMG_DIR"] = st.text_input("📁 截图文件夹 IMG_DIR", config["IMG_DIR"])
-config["TXT_PREFILL_DIR"] = st.text_input("📄 预填文本 TXT_PREFILL_DIR", config["TXT_PREFILL_DIR"])
-config["ANSWER_DIR"] = st.text_input("📂 已生成答案 ANSWER_DIR", config["ANSWER_DIR"])
-DOCX_PATH = os.path.join(config["ANSWER_DIR"], "汇总口语答案.docx")
+TEMP_IMG_DIR = "uploaded_imgs"
+TXT_PREFILL_DIR = "txt_prefill"
+ANSWER_DIR = "answer_output"
+DOCX_PATH = os.path.join(ANSWER_DIR, "汇总口语答案.docx")
 
-if st.button("💾 保存路径配置"):
-    save_config(config)
-    st.success("✅ 已保存配置！")
+os.makedirs(TEMP_IMG_DIR, exist_ok=True)
+os.makedirs(TXT_PREFILL_DIR, exist_ok=True)
+os.makedirs(ANSWER_DIR, exist_ok=True)
 
-st.divider()
+if uploaded_files:
+    for i, file in enumerate(uploaded_files):
+        ext = os.path.splitext(file.name)[-1]
+        save_path = os.path.join(TEMP_IMG_DIR, f"雅思哥截图_{i+1}{ext}")
+        with open(save_path, "wb") as f:
+            f.write(file.read())
+    st.success(f"✅ 已保存 {len(uploaded_files)} 张图片到 {TEMP_IMG_DIR} 文件夹")
 
-# === 每个功能模块按钮 ===
+# === 执行函数 ===
 def run_step(label, script_path, args_list):
     with st.status(f"{label} 执行中...", expanded=True) as status:
         try:
@@ -60,26 +50,25 @@ def run_step(label, script_path, args_list):
         except Exception as e:
             st.error(f"❌ 执行失败: {e}")
 
+# === 操作按钮 ===
 col1, col2 = st.columns(2)
 
 with col1:
     if st.button("Step 1: 重命名截图"):
-        run_step("Step 1", SCRIPT_MAP["Step 1"], ["--input", config["IMG_DIR"], "--prefix", "雅思哥截图"])
+        run_step("Step 1", SCRIPT_MAP["Step 1"], ["--input", TEMP_IMG_DIR, "--prefix", "雅思哥截图"])
 
     if st.button("Step 3: 生成答案"):
-        run_step("Step 3", SCRIPT_MAP["Step 3"], ["--input", config["TXT_PREFILL_DIR"], "--output", config["ANSWER_DIR"]])
+        run_step("Step 3", SCRIPT_MAP["Step 3"], ["--input", TXT_PREFILL_DIR, "--output", ANSWER_DIR])
 
     if st.button("Step 5: 合并Q&A"):
-        run_step("Step 5", SCRIPT_MAP["Step 5"], ["--input", config["TXT_PREFILL_DIR"], "--output", config["ANSWER_DIR"]])
+        run_step("Step 5", SCRIPT_MAP["Step 5"], ["--input", TXT_PREFILL_DIR, "--output", ANSWER_DIR])
 
 with col2:
     if st.button("Step 2: 截图转文本"):
-        run_step("Step 2", SCRIPT_MAP["Step 2"], ["--input", config["IMG_DIR"], "--output", config["TXT_PREFILL_DIR"]])
+        run_step("Step 2", SCRIPT_MAP["Step 2"], ["--input", TEMP_IMG_DIR, "--output", TXT_PREFILL_DIR])
 
     if st.button("Step 4: TXT转Word"):
-        run_step("Step 4", SCRIPT_MAP["Step 4"], ["--input", config["ANSWER_DIR"], "--output", DOCX_PATH])
+        run_step("Step 4", SCRIPT_MAP["Step 4"], ["--input", ANSWER_DIR, "--output", DOCX_PATH])
 
 st.divider()
 st.caption("© DimitriDai 口语工作流原型 | Powered by Streamlit + Python")
-# 输入 cd "D:\Python\Code\EduTech"      
-#      streamlit run Spk_topic_org_app.py
