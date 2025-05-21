@@ -6,7 +6,7 @@ from docx.shared import Pt
 from docx.oxml.ns import qn
 
 # 设置路径
-source_folder = r"D:\备课\02口语话题\已生成答案"
+source_folder = "answer"  # 你在项目中创建的 answer 文件夹
 output_path = os.path.join(source_folder, "汇总口语答案.docx")
 
 # 创建文档对象
