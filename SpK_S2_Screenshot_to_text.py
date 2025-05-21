@@ -180,7 +180,7 @@ def call_deepseek(prompt_text):
 def process_all_images():
     image_files = [
     f for f in os.listdir(IMAGE_FOLDER)
-    if f.lower().endswith(('.png', '.jpg', '.jpeg')) and f.startswith("雅思哥截图")
+    if f.lower().endswith(('.png', '.jpg', '.jpeg')) and f.startswith("截图")
     ]
     if not image_files:
         print("没有找到任何图片。")
